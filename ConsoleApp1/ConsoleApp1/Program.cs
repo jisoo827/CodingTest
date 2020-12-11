@@ -1425,7 +1425,7 @@ namespace ConsoleApp1
 		}
 
 		/// <summary>
-		/// 오토에버 챌린지 1번
+		/// 오토에버 챌린지 3번
 		/// </summary>
 		/// <param name="pStr"></param>
 		/// <returns></returns>
@@ -1593,6 +1593,12 @@ namespace ConsoleApp1
 			}
 		}
 
+		/// <summary>
+		/// 프로그래머스 완전탐색 2단계 카펫
+		/// </summary>
+		/// <param name="brown"></param>
+		/// <param name="yellow"></param>
+		/// <returns></returns>
 		public static int[] Capet(int brown, int yellow)
 		{
 			//10 2 [4,3] // 8 1 [3,3] //24 24 [8,6]
@@ -1652,6 +1658,51 @@ namespace ConsoleApp1
 			}
 			return answer;
 		}
+
+		/// <summary>
+		/// 프로그래머스 동적계획법 3단계 N으로 표현
+		/// </summary>
+		/// <param name="N"></param>
+		/// <param name="number"></param>
+		/// <returns></returns>
+		public static int ExpressedByN(int N, int number)
+        {
+			List<List<int>> dplist = new List<List<int>>();
+			List<int> list = new List<int>();
+			list.Add(N);
+			dplist.Add(list);
+
+			for(int i = 1; i < 8; i++)
+            {
+				List<int> tempList = new List<int>();
+				tempList.Add((N * (int)Math.Pow(10, i)) + dplist[i - 1][0]);
+				dplist.Add(tempList);
+            }
+
+			for(int i = 0; i < 8; i++)
+            {
+				for(int j = 0; j <= i; j++)
+                {
+					if (i + j + 1 >= 8) break;
+					for(int icnt = 0; icnt < dplist[i].Count; icnt++)
+                    {
+						for (int jcnt = 0; jcnt < dplist[j].Count; jcnt++)
+                        {
+							if (dplist[i][icnt] < 0 || dplist[j][jcnt] < 0) continue;
+							dplist[i + j + 1].Add(dplist[i][icnt] + dplist[j][jcnt]);
+							dplist[i + j + 1].Add(dplist[i][icnt] - dplist[j][jcnt]);
+							dplist[i + j + 1].Add(dplist[i][icnt] * dplist[j][jcnt]);
+							if (dplist[j][jcnt] > 0) dplist[i + j + 1].Add(dplist[i][icnt] / dplist[j][jcnt]);
+							if (dplist[i][icnt] > 0) dplist[i + j + 1].Add(dplist[j][jcnt] / dplist[i][icnt]);
+						}
+                    }
+					dplist[i + j + 1] = dplist[i + j + 1].Distinct().ToList();
+				}
+
+				if (dplist[i].Contains(number)) return i + 1;
+            }
+			return -1;
+        }
 	}
 	public class Print
 	{
