@@ -7,10 +7,10 @@ using System.Text;
 
 namespace ConsoleApp1
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
+	class Program
+	{
+		static void Main(string[] args)
+		{
 			Program p = new Program();
 
 			#region TestEnd
@@ -83,7 +83,7 @@ namespace ConsoleApp1
 			//FarthestNode(6, new int[,] { { 3, 6 }, { 4, 3 }, { 3, 2 }, { 1, 3 }, { 1, 2 }, { 2, 4 }, { 5, 2 } });
 			//FarthestNode(10, new int[,] { { 1, 6 }, { 6, 5 }, { 5, 2 }, { 2, 3 }, { 1, 4 }, { 4, 10 }, { 10, 8 }, { 8, 9 }});
 			Debug.WriteLine(BestAlbum(new string[] { "classic", "pop", "classic", "classic", "pop", "pop" }, new int[] { 500, 600, 150, 800, 2500,600 }));
-        }
+		}
 
 		/// <summary>
 		/// 프로그래머스 해시 3단계 베스트앨범
@@ -92,48 +92,48 @@ namespace ConsoleApp1
 		/// <param name="plays"></param>
 		/// <returns></returns>
 		static int[] BestAlbum(string[] genres, int[] plays)
-        {
-            Dictionary<string, dynamic> dict = new Dictionary<string, dynamic>();
-            Dictionary<string, int> dictSum = new Dictionary<string, int>();
-            for (int i = 0; i < genres.Length; i++)
-            {
-                if (!dict.ContainsKey(genres[i]))
-                {
-                    dict.Add(genres[i], new Dictionary<int,int>());
-                    dictSum.Add(genres[i], 0);
-                }
-                {
-                    dict[genres[i]].Add(i, plays[i]);
-                    dictSum[genres[i]] += plays[i];
-                }
-            }
+		{
+			Dictionary<string, dynamic> dict = new Dictionary<string, dynamic>();
+			Dictionary<string, int> dictSum = new Dictionary<string, int>();
+			for (int i = 0; i < genres.Length; i++)
+			{
+				if (!dict.ContainsKey(genres[i]))
+				{
+					dict.Add(genres[i], new Dictionary<int,int>());
+					dictSum.Add(genres[i], 0);
+				}
+				{
+					dict[genres[i]].Add(i, plays[i]);
+					dictSum[genres[i]] += plays[i];
+				}
+			}
 
-            var dictSort = dictSum.OrderByDescending(x => x.Value);
-            for(int i = 0; i < dict.Count(); i++)
-            {
-                var value = (Dictionary<int,int>)dict.ElementAt(i).Value;
-                var descending = value.OrderBy(x => x.Key).OrderByDescending(y => y.Value).ToList();
-                dict[dict.ElementAt(i).Key] = descending;
+			var dictSort = dictSum.OrderByDescending(x => x.Value);
+			for(int i = 0; i < dict.Count(); i++)
+			{
+				var value = (Dictionary<int,int>)dict.ElementAt(i).Value;
+				var descending = value.OrderBy(x => x.Key).OrderByDescending(y => y.Value).ToList();
+				dict[dict.ElementAt(i).Key] = descending;
 
-            }
-            Queue q = new Queue();
-            for (int i = 0; i < dictSort.Count(); i++)
-            {
-                int count = 0;
-                foreach(var value in dict[dictSort.ElementAt(i).Key])
-                {
-                    if (count == 2) break;
-                    q.Enqueue(value.Key);
-                    count++;
-                }
-            }
-            int[] answer = new int[q.Count];
-            for(int i = 0; i < answer.Length; i++)
-            {
-                answer[i] = Convert.ToInt32(q.Dequeue());
-            }
-            return answer;
-        }
+			}
+			Queue q = new Queue();
+			for (int i = 0; i < dictSort.Count(); i++)
+			{
+				int count = 0;
+				foreach(var value in dict[dictSort.ElementAt(i).Key])
+				{
+					if (count == 2) break;
+					q.Enqueue(value.Key);
+					count++;
+				}
+			}
+			int[] answer = new int[q.Count];
+			for(int i = 0; i < answer.Length; i++)
+			{
+				answer[i] = Convert.ToInt32(q.Dequeue());
+			}
+			return answer;
+		}
 		public int[] solution(int[] heights)
 		{
 			Stack stack = new Stack();
@@ -1666,28 +1666,28 @@ namespace ConsoleApp1
 		/// <param name="number"></param>
 		/// <returns></returns>
 		public static int ExpressedByN(int N, int number)
-        {
+		{
 			List<List<int>> dplist = new List<List<int>>();
 			List<int> list = new List<int>();
 			list.Add(N);
 			dplist.Add(list);
 
 			for(int i = 1; i < 8; i++)
-            {
+			{
 				List<int> tempList = new List<int>();
 				tempList.Add((N * (int)Math.Pow(10, i)) + dplist[i - 1][0]);
 				dplist.Add(tempList);
-            }
+			}
 
 			for(int i = 0; i < 8; i++)
-            {
+			{
 				for(int j = 0; j <= i; j++)
-                {
+				{
 					if (i + j + 1 >= 8) break;
 					for(int icnt = 0; icnt < dplist[i].Count; icnt++)
-                    {
+					{
 						for (int jcnt = 0; jcnt < dplist[j].Count; jcnt++)
-                        {
+						{
 							if (dplist[i][icnt] < 0 || dplist[j][jcnt] < 0) continue;
 							dplist[i + j + 1].Add(dplist[i][icnt] + dplist[j][jcnt]);
 							dplist[i + j + 1].Add(dplist[i][icnt] - dplist[j][jcnt]);
@@ -1695,14 +1695,14 @@ namespace ConsoleApp1
 							if (dplist[j][jcnt] > 0) dplist[i + j + 1].Add(dplist[i][icnt] / dplist[j][jcnt]);
 							if (dplist[i][icnt] > 0) dplist[i + j + 1].Add(dplist[j][jcnt] / dplist[i][icnt]);
 						}
-                    }
+					}
 					dplist[i + j + 1] = dplist[i + j + 1].Distinct().ToList();
 				}
 
 				if (dplist[i].Contains(number)) return i + 1;
-            }
+			}
 			return -1;
-        }
+		}
 	}
 	public class Print
 	{
