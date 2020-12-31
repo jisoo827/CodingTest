@@ -77,12 +77,22 @@ namespace ConsoleApp1
 			//Capet(10, 2);
 			//Capet(8, 1);
 			//Capet(24, 24);
-			#endregion
 
-			Tree_Dp();
+			//p.Bridge(5, new int[,] { { 0, 1, 1 }, { 0, 2, 2 }, { 1, 2, 5 }, { 1, 3, 3 }, { 2, 3, 8 }, { 3, 4, 1 } });
+			//p.Bridge(5, new int[,] { { 0, 1, 1 }, { 2, 3, 1 }, { 3, 4, 2 }, { 1, 2, 2 }, { 0, 4, 100 } });
+
+			//Tree_Dp();
 			//FarthestNode(6, new int[,] { { 3, 6 }, { 4, 3 }, { 3, 2 }, { 1, 3 }, { 1, 2 }, { 2, 4 }, { 5, 2 } });
 			//FarthestNode(10, new int[,] { { 1, 6 }, { 6, 5 }, { 5, 2 }, { 2, 3 }, { 1, 4 }, { 4, 10 }, { 10, 8 }, { 8, 9 }});
-			Debug.WriteLine(BestAlbum(new string[] { "classic", "pop", "classic", "classic", "pop", "pop" }, new int[] { 500, 600, 150, 800, 2500,600 }));
+			//Balloon(new int[] { -16, 27, 65, -2, 58, -92, -71, -68, -61, -33 });
+			//Network(3, new int[,] { { 1, 1, 0 }, { 1, 1, 0 }, { 0, 0, 1 } });
+			//Network(4, new int[,] { { 1, 0, 0, 1 }, { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 1 } });
+			//Network(5, new int[,] { { 1, 1, 0, 0, 0 }, { 1, 1, 1, 0, 0 }, { 0, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1 } });
+			//Debug.WriteLine(BestAlbum(new string[] { "classic", "pop", "classic", "classic", "pop", "pop" }, new int[] { 500, 600, 150, 800, 2500,600 }));
+			#endregion
+			TravelPath( new string[,] { { "ICN", "SFO" }, { "ICN", "ATL" }, { "SFO", "ATL" }, { "ATL", "ICN" }, { "ATL", "SFO" } });
+			TravelPath(new string[,] { { "ICN", "JFK" }, { "HND", "IAD" }, { "JFK", "HND" } });
+			TravelPath(new string[,] { { "ICN", "2" }, { "2", "ICN" }, { "ICN", "2" }, { "2", "3" }});
 		}
 
 		/// <summary>
@@ -99,7 +109,7 @@ namespace ConsoleApp1
 			{
 				if (!dict.ContainsKey(genres[i]))
 				{
-					dict.Add(genres[i], new Dictionary<int,int>());
+					dict.Add(genres[i], new Dictionary<int, int>());
 					dictSum.Add(genres[i], 0);
 				}
 				{
@@ -109,9 +119,9 @@ namespace ConsoleApp1
 			}
 
 			var dictSort = dictSum.OrderByDescending(x => x.Value);
-			for(int i = 0; i < dict.Count(); i++)
+			for (int i = 0; i < dict.Count(); i++)
 			{
-				var value = (Dictionary<int,int>)dict.ElementAt(i).Value;
+				var value = (Dictionary<int, int>)dict.ElementAt(i).Value;
 				var descending = value.OrderBy(x => x.Key).OrderByDescending(y => y.Value).ToList();
 				dict[dict.ElementAt(i).Key] = descending;
 
@@ -120,7 +130,7 @@ namespace ConsoleApp1
 			for (int i = 0; i < dictSort.Count(); i++)
 			{
 				int count = 0;
-				foreach(var value in dict[dictSort.ElementAt(i).Key])
+				foreach (var value in dict[dictSort.ElementAt(i).Key])
 				{
 					if (count == 2) break;
 					q.Enqueue(value.Key);
@@ -128,7 +138,7 @@ namespace ConsoleApp1
 				}
 			}
 			int[] answer = new int[q.Count];
-			for(int i = 0; i < answer.Length; i++)
+			for (int i = 0; i < answer.Length; i++)
 			{
 				answer[i] = Convert.ToInt32(q.Dequeue());
 			}
@@ -1014,19 +1024,12 @@ namespace ConsoleApp1
 		/// <param name="n"></param>
 		/// <param name="costs"></param>
 		/// <returns></returns>
-		public int bridge(int n, int[,] costs)
+		public int Bridge(int n, int[,] costs)
 		{
-			//bridge(4,new int[,] {{0,1,1},{0,2,2},{1,2,5},{1,3,1},{2,3,8}})
+			//bridge(5,new int[,] {{0,1,1},{0,2,2},{1,2,5},{1,3,3},{2,3,8},{3,4,1}})
 			int answer = 0;
-			bool isThere = false;
-			List<int> list = new List<int>();
-			for (int i = 0; i < costs.GetLength(0); i++)
-			{
-				if (list.Where(x => x == costs[i, 0]).Count() > 0) continue;
-				list.Add(costs[i, 0]);
-				if (list.Where(x => x == costs[i, 1]).Count() > 0) continue;
-				list.Add(costs[i, 1]);
-			}
+			int[] island = new int[n];
+			int check = 1;
 
 			var sorted = from x in Enumerable.Range(0, costs.GetLength(0))
 						 select new
@@ -1039,21 +1042,25 @@ namespace ConsoleApp1
 						 select point;
 			foreach (var test in sorted)
 			{
-				isThere = false;
-				if (list.Count == 0) break;
-				for (int i = 0; i < list.Count(); i++)
+				if (island[test.X] == 0 && island[test.Y] == 0)
 				{
-					if (list[i] == test.X || list[i] == test.Y)
-					{
-						list.RemoveAt(i);
-						isThere = true;
-						i--;
+					island[test.X] = island[test.Y] = check++;
+				}
+				else if (island[test.X] == 0 || island[test.Y] == 0)
+                {
+					island[test.X] = island[test.Y] = Math.Max(island[test.X], island[test.Y]);
+                }
+				else 
+                {
+					if (island[test.X] == island[test.Y]) continue;
+					int testY = island[test.Y];
+					for (int i = 0; i < island.Count(); i++)
+                    {
+						island[i] = island[i] == testY ? island[test.X] : island[i];
 					}
-				}
-				if (isThere)
-				{
-					answer += test.Z;
-				}
+
+                }
+				answer += test.Z;
 			}
 			return answer;
 		}
@@ -1672,19 +1679,19 @@ namespace ConsoleApp1
 			list.Add(N);
 			dplist.Add(list);
 
-			for(int i = 1; i < 8; i++)
+			for (int i = 1; i < 8; i++)
 			{
 				List<int> tempList = new List<int>();
 				tempList.Add((N * (int)Math.Pow(10, i)) + dplist[i - 1][0]);
 				dplist.Add(tempList);
 			}
 
-			for(int i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 			{
-				for(int j = 0; j <= i; j++)
+				for (int j = 0; j <= i; j++)
 				{
 					if (i + j + 1 >= 8) break;
-					for(int icnt = 0; icnt < dplist[i].Count; icnt++)
+					for (int icnt = 0; icnt < dplist[i].Count; icnt++)
 					{
 						for (int jcnt = 0; jcnt < dplist[j].Count; jcnt++)
 						{
@@ -1703,6 +1710,128 @@ namespace ConsoleApp1
 			}
 			return -1;
 		}
+
+		/// <summary>
+		/// 프로그래머스 월간 코드 챌린지 시즌1 3단계 풍선터트리기
+		/// </summary>
+		/// <param name="a"></param>
+		/// <returns></returns>
+		public static int Balloon(int[] a)
+		{
+			//[-16,27,65,-2,58,-92,-71,-68,-61,-33]
+			//-16, -92, -71, -68, -61, -33
+			if (a.Length == 1) return 1;
+
+			int answer = 0;
+			int length = a.Length;
+			int[] minFront = new int[length];
+			int[] minBack = new int[length];
+
+			minFront[0] = a[0];
+			minBack[length - 1] = a[length - 1];
+			for (int i = 1; i < length; i++)
+			{
+				minFront[i] = Math.Min(minFront[i - 1], a[i]);
+				minBack[length - 1 - i] = Math.Min(minBack[length - i], a[length - 1 - i]);
+			}
+
+			for (int i = 1; i < a.Length - 1; i++)
+			{
+				if (a[i] > minFront[i - 1] && a[i] > minBack[i + 1]) continue;
+				answer++;
+			}
+
+			return answer + 2;
+		}
+
+		/// <summary>
+		/// 프로그래머스 깊이/너비 우선 탐색(DFS/BFS) 3단계 네트워크
+		/// </summary>
+		/// <param name="n"></param>
+		/// <param name="computers"></param>
+		/// <returns></returns>
+		public static int Network(int n, int[,] computers)
+		{
+			int answer = 200;
+			int[] network = new int[n];
+			int temp = 0;
+			Queue<int> que = new Queue<int>();
+			for (int i = 0; i < computers.GetLength(0); i++)
+			{
+				if (network[i] == 0) que.Enqueue(i);
+				while (que.Count > 0)
+				{
+					temp = que.Dequeue();
+					for (int j = 0; j < computers.GetLength(0); j++)
+					{
+						if (computers[temp, j] == 0) continue;
+						if (network[j] == answer) continue;
+						if (temp == j && network[temp] == 0) network[temp] = --answer;
+						if (temp == j) continue;
+
+						network[j] = answer;
+						que.Enqueue(j);
+					}
+				}
+			}
+			
+			return 200 - answer;
+		}
+
+		/// <summary>
+		/// 프로그래머스 깊이/너비 우선 탐색(DFS/BFS) 3단계 여행경로
+		/// </summary>
+		/// <param name="tickets"></param>
+		/// <returns></returns>
+		public static string[] TravelPath(string[,] tickets)
+        {
+			
+			List<string> answerList = new List<string>();
+			Dictionary<string, List<Tuple<string,int>>> dict = new Dictionary<string, List<Tuple<string, int>>>();
+			for (int i = 0; i < tickets.GetLength(0); i++)
+            {
+				List<Tuple<string, int>> list = new List<Tuple<string, int>>();
+				list.Add(Tuple.Create(tickets[i, 1], 0));
+				if(!dict.ContainsKey(tickets[i,0])) dict.Add(tickets[i, 0],list);
+				else
+                {
+					list = dict[tickets[i, 0]];
+					list.Add(Tuple.Create(tickets[i, 1], 0));
+					dict[tickets[i, 0]] = list;
+				}
+            }
+			for (int i = 0; i < dict.Count; i++)
+			{
+				var sub = dict.ElementAt(i).Value.OrderBy(key => key.Item1);
+				dict[dict.ElementAt(i).Key] = sub.ToList((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
+			}
+			
+			Queue<string> queue = new Queue<string>();
+			queue.Enqueue("ICN");
+			while(queue.Count > 0)
+            {
+				string key = queue.Dequeue();
+				answerList.Add(key);
+				Dictionary<string, int> value = dict[key];
+				for(int i = 0; i < value.Count; i++)
+                {
+					if (value.ElementAt(i).Value == 0)
+					{
+						if (!dict.ContainsKey(value.ElementAt(i).Key))
+						{
+							if (answerList.Count == tickets.GetLength(0)) answerList.Add(value.ElementAt(i).Key);
+							continue;
+						}
+						queue.Enqueue(value.ElementAt(i).Key);
+						value[value.ElementAt(i).Key] = 1;
+						dict[key] = value;
+						break;
+					}
+                }
+            }
+			string[] answer = answerList.ToArray();
+			return answer;
+        }
 	}
 	public class Print
 	{
