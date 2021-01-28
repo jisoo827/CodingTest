@@ -89,10 +89,15 @@ namespace ConsoleApp1
 			//Network(4, new int[,] { { 1, 0, 0, 1 }, { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 1 } });
 			//Network(5, new int[,] { { 1, 1, 0, 0, 0 }, { 1, 1, 1, 0, 0 }, { 0, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1 } });
 			//Debug.WriteLine(BestAlbum(new string[] { "classic", "pop", "classic", "classic", "pop", "pop" }, new int[] { 500, 600, 150, 800, 2500,600 }));
+			//TriangularSnail(5);
 			#endregion
-			TravelPath( new string[,] { { "ICN", "SFO" }, { "ICN", "ATL" }, { "SFO", "ATL" }, { "ATL", "ICN" }, { "ATL", "SFO" } });
-			TravelPath(new string[,] { { "ICN", "JFK" }, { "HND", "IAD" }, { "JFK", "HND" } });
-			TravelPath(new string[,] { { "ICN", "2" }, { "2", "ICN" }, { "ICN", "2" }, { "2", "3" }});
+			//TravelPath(new string[,] { { "ICN", "SFO" }, { "ICN", "ATL" }, { "SFO", "ATL" }, { "ATL", "ICN" }, { "ATL", "SFO" } });
+			//TravelPath(new string[,] { { "ICN", "JFK" }, { "HND", "IAD" }, { "JFK", "HND" } });
+			//TravelPath(new string[,] { { "ICN", "2" }, { "2", "ICN" }, { "ICN", "2" }, { "2", "3" } });
+			//TravelPath(new string[,] { { "ICN" , "2" }, { "2", "ICN" }, { "ICN", "2" }, { "2", "ICN" }, { "ICN", "2" } });
+			TravelPath(new string[,] { { "1", "3" }, { "1", "2" }, { "3", "1" }, { "2", "4" } });
+			//TravelPath(new string[,] {{"ICN", "BOO"}, {"ICN", "COO"}, {"COO", "DOO"}, {"DOO", "COO"}, {"BOO", "DOO"},{"DOO", "BOO"}, {"BOO", "ICN"}, {"COO", "BOO"}});
+
 		}
 
 		/// <summary>
@@ -1784,8 +1789,7 @@ namespace ConsoleApp1
 		/// <param name="tickets"></param>
 		/// <returns></returns>
 		public static string[] TravelPath(string[,] tickets)
-        {
-			
+        {		
 			List<string> answerList = new List<string>();
 			Dictionary<string, List<Tuple<string,int>>> dict = new Dictionary<string, List<Tuple<string, int>>>();
 			for (int i = 0; i < tickets.GetLength(0); i++)
@@ -1803,7 +1807,8 @@ namespace ConsoleApp1
 			for (int i = 0; i < dict.Count; i++)
 			{
 				var sub = dict.ElementAt(i).Value.OrderBy(key => key.Item1);
-				dict[dict.ElementAt(i).Key] = sub.ToList((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
+				dict[dict.ElementAt(i).Key] = sub.ToList();
+				//dict[dict.ElementAt(i).Key] = sub.ToList((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
 			}
 			
 			Queue<string> queue = new Queue<string>();
@@ -1812,26 +1817,87 @@ namespace ConsoleApp1
             {
 				string key = queue.Dequeue();
 				answerList.Add(key);
-				Dictionary<string, int> value = dict[key];
-				for(int i = 0; i < value.Count; i++)
+				//Dictionary<string, int> value =  dict[key];
+				List<Tuple<string, int>> value = dict[key];
+				for (int i = 0; i < value.Count; i++)
                 {
-					if (value.ElementAt(i).Value == 0)
+					if (value[i].Item2 == 0)
 					{
-						if (!dict.ContainsKey(value.ElementAt(i).Key))
+						if (dict.ContainsKey(value[i].Item1) && dict[value[i].Item1].Exists(x => x.Item2 == 0))
 						{
-							if (answerList.Count == tickets.GetLength(0)) answerList.Add(value.ElementAt(i).Key);
-							continue;
+							queue.Enqueue(value[i].Item1);
+							value[i] = Tuple.Create(value[i].Item1, 1);
+							dict[key] = value;
+							break;
 						}
-						queue.Enqueue(value.ElementAt(i).Key);
-						value[value.ElementAt(i).Key] = 1;
-						dict[key] = value;
-						break;
+						if (answerList.Count == tickets.GetLength(0)) answerList.Add(value[i].Item1);
+						continue;
 					}
                 }
             }
 			string[] answer = answerList.ToArray();
 			return answer;
         }
+
+		/// <summary>
+		/// 프로그래머스 월간 코드 챌린지 시즌1 2단계 삼각 달팽이
+		/// </summary>
+		/// <param name="n"></param>
+		/// <returns></returns>
+		public static int[] TriangularSnail(int n)
+		{
+			//4 [1, 2, 9, 3, 10, 8, 4, 5, 6, 7]
+			//5 [1, 2, 12, 3, 13, 11, 4, 14, 15, 10, 5, 6, 7, 8, 9]
+			//6 [1, 2, 15, 3, 16, 14, 4, 17, 21, 13, 5, 18, 19, 20, 12, 6, 7, 8, 9, 10, 11]
+			int[] answer = new int[(n*(n+1))/2] ;
+			int[,] arr = new int[n, n];
+			int idx = 1;
+			int row = 0;
+			int col = 0;
+			char flag = 'D';
+			for (int i = n; i > 0; i--)
+            {
+				switch (flag)
+				{
+					case 'D':
+						for (int j = 0; j < i; j++)
+						{
+							arr[row + j, col] = idx++;
+						}
+						row += i - 1;
+						col++;
+						flag = 'R';
+						break;
+					case 'R':
+						for (int j = 0; j < i; j++)
+						{
+							arr[row, col + j] = idx++;
+						}
+						row--;
+						col += i - 2;
+						flag = 'U';
+						break;
+					case 'U':
+						for (int j = 0; j < i; j++)
+						{
+							arr[row--, col--] = idx++;
+						}
+						row += 2;
+						col++;
+						flag = 'D';
+						break;
+                }				
+            }
+			idx = 0;
+			for(int i = 0; i < n; i ++)
+            {
+				for(int j = 0; j <= i; j++)
+                {
+					answer[idx++] = arr[i, j];
+                }
+            }
+			return answer;
+		}
 	}
 	public class Print
 	{
