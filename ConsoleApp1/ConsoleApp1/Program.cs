@@ -90,14 +90,15 @@ namespace ConsoleApp1
 			//Network(5, new int[,] { { 1, 1, 0, 0, 0 }, { 1, 1, 1, 0, 0 }, { 0, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1 } });
 			//Debug.WriteLine(BestAlbum(new string[] { "classic", "pop", "classic", "classic", "pop", "pop" }, new int[] { 500, 600, 150, 800, 2500,600 }));
 			//TriangularSnail(5);
-			#endregion
 			//TravelPath(new string[,] { { "ICN", "SFO" }, { "ICN", "ATL" }, { "SFO", "ATL" }, { "ATL", "ICN" }, { "ATL", "SFO" } });
 			//TravelPath(new string[,] { { "ICN", "JFK" }, { "HND", "IAD" }, { "JFK", "HND" } });
 			//TravelPath(new string[,] { { "ICN", "2" }, { "2", "ICN" }, { "ICN", "2" }, { "2", "3" } });
 			//TravelPath(new string[,] { { "ICN" , "2" }, { "2", "ICN" }, { "ICN", "2" }, { "2", "ICN" }, { "ICN", "2" } });
-			TravelPath(new string[,] { { "1", "3" }, { "1", "2" }, { "3", "1" }, { "2", "4" } });
+			//TravelPath(new string[,] { { "1", "3" }, { "1", "2" }, { "3", "1" }, { "2", "4" } });
 			//TravelPath(new string[,] {{"ICN", "BOO"}, {"ICN", "COO"}, {"COO", "DOO"}, {"DOO", "COO"}, {"BOO", "DOO"},{"DOO", "BOO"}, {"BOO", "ICN"}, {"COO", "BOO"}});
-
+			//PlusNumbers(new int[] { 5, 0, 2, 7 });
+			#endregion
+			ConvertWord("hit", "cog", new string[] { "hot", "dot", "dog", "lot", "log", "cog" });
 		}
 
 		/// <summary>
@@ -1808,35 +1809,43 @@ namespace ConsoleApp1
 			{
 				var sub = dict.ElementAt(i).Value.OrderBy(key => key.Item1);
 				dict[dict.ElementAt(i).Key] = sub.ToList();
-				//dict[dict.ElementAt(i).Key] = sub.ToList((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
 			}
-			
-			Queue<string> queue = new Queue<string>();
-			queue.Enqueue("ICN");
-			while(queue.Count > 0)
-            {
-				string key = queue.Dequeue();
-				answerList.Add(key);
-				//Dictionary<string, int> value =  dict[key];
+
+			answerList = FindPath(answerList, dict, "ICN", tickets.GetLength(0) + 1);
+
+			string[] answer = answerList.ToArray();
+			return answer;
+        }
+
+		public static List<string> FindPath(List<string> answerList,  Dictionary<string, List<Tuple<string, int>>> dict,string key, int pathCnt)
+        {
+			List<string> answerListSub = new List<string>();
+			foreach (string str in answerList) answerListSub.Add(str);
+			answerListSub.Add(key);
+			if (dict.ContainsKey(key))
+			{
 				List<Tuple<string, int>> value = dict[key];
 				for (int i = 0; i < value.Count; i++)
-                {
+				{
 					if (value[i].Item2 == 0)
 					{
 						if (dict.ContainsKey(value[i].Item1) && dict[value[i].Item1].Exists(x => x.Item2 == 0))
 						{
-							queue.Enqueue(value[i].Item1);
 							value[i] = Tuple.Create(value[i].Item1, 1);
 							dict[key] = value;
-							break;
 						}
-						if (answerList.Count == tickets.GetLength(0)) answerList.Add(value[i].Item1);
-						continue;
+						answerListSub = FindPath(answerListSub, dict, value[i].Item1, pathCnt);
+						if (answerListSub.Count == pathCnt)
+						{
+							return answerListSub;
+						}
+						value[i] = Tuple.Create(value[i].Item1, 0);
+						dict[key] = value;
 					}
-                }
-            }
-			string[] answer = answerList.ToArray();
-			return answer;
+				}
+			}
+			if (answerListSub.Count != pathCnt) return answerList;
+			return answerListSub;
         }
 
 		/// <summary>
@@ -1898,6 +1907,61 @@ namespace ConsoleApp1
             }
 			return answer;
 		}
+
+		/// <summary>
+		/// 프로그래머스 월간 코드 챌린지 시즌1 1단계 두 개 뽑아서 더하기
+		/// </summary>
+		/// <param name="n"></param>
+		/// <returns></returns>
+		public static int[] PlusNumbers(int[] numbers)
+        {
+			Queue<int> que = new Queue<int>();
+			for (int i = 0; i < numbers.Length - 1; i++)
+            {
+				for (int j = i + 1; j < numbers.Length; j++)
+                {
+					que.Enqueue(numbers[i] + numbers[j]);
+                }
+			}
+			int[] answer = new int[que.Count];
+			int cnt = 0;
+			while (que.Count > 0) answer[cnt++] = que.Dequeue();
+			answer = answer.Distinct().ToArray();
+			Array.Sort(answer);
+			return answer;
+        }
+
+		public static int ConvertWord(string begin, string target, string[] words)
+		{
+			int answer = 0;
+			bool[] visited = new bool[words.Length];
+			CheckWord(begin, target, words, ref visited, ref answer);
+			return answer;
+		}
+		public static void CheckWord(string begin, string target, string[] words, ref bool[] visited, ref int answer)
+        {
+			if (begin == target)
+			{
+				if (answer == 0) answer = visited.Where(x => x == true).Count();
+				else answer = Math.Min(answer, visited.Where(x => x == true).Count());
+				return;
+			}
+			for(int i = 0; i < words.Length; i++)
+            {
+				if (visited[i]) continue;
+				int cnt = 0;
+				for (int j = 0; j <begin.Length; j++)
+                {
+					if (begin[j] != words[i][j]) cnt++;
+					if (cnt > 1) break;
+				}
+				if (cnt > 1) continue;
+				visited[i] = true;
+				CheckWord(words[i], target, words, ref visited, ref answer);
+				visited[i] = false;
+			}
+			return ;
+        }
 	}
 	public class Print
 	{
