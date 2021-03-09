@@ -97,8 +97,17 @@ namespace ConsoleApp1
 			//TravelPath(new string[,] { { "1", "3" }, { "1", "2" }, { "3", "1" }, { "2", "4" } });
 			//TravelPath(new string[,] {{"ICN", "BOO"}, {"ICN", "COO"}, {"COO", "DOO"}, {"DOO", "COO"}, {"BOO", "DOO"},{"DOO", "BOO"}, {"BOO", "ICN"}, {"COO", "BOO"}});
 			//PlusNumbers(new int[] { 5, 0, 2, 7 });
+			//ConvertWord("hit", "cog", new string[] { "hot", "dot", "dog", "lot", "log", "cog" });
+			//BoxingRank(5, new int[,] { { 4, 3 }, { 4, 2 }, { 3, 2 }, { 1, 2 }, { 2, 5 } });
+			//long answer = p.Immigration(6, new int[] { 7, 10 });
+			//BigNumber(new int[] { 6, 10, 2 });
+			//BigNumber(new int[] { 3, 30, 34, 5, 9 });
+			//BigNumber(new int[] { 0, 0, 0, 0, 0 });
+			//BigNumber(new int[] { 40,403 });
+			//BigNumber(new int[] { 1000, 0, 5, 99, 100 });
 			#endregion
-			ConvertWord("hit", "cog", new string[] { "hot", "dot", "dog", "lot", "log", "cog" });
+
+			BinaryConvert("110010101001");
 		}
 
 		/// <summary>
@@ -1962,6 +1971,118 @@ namespace ConsoleApp1
 			}
 			return ;
         }
+
+		public static int BoxingRank(int n, int[,] results)
+		{
+			//5	[[4, 3], [4, 2], [3, 2], [1, 2], [2, 5]]
+			int answer = 0;
+            int[,] dp = new int[n + 1, n + 1];
+			for(int i = 0; i < results.GetLength(0); i++)
+            {
+				dp[results[i, 0], results[i, 1]] = 1;
+				dp[results[i, 1], results[i, 0]] = -1;
+			}
+
+			for(int i = 1; i < dp.GetLength(0); i++)
+            {
+				for(int j = 1; j < dp.GetLength(0); j++)
+                {
+					if (i == j) continue;
+					for (int k = 1; k < dp.GetLength(0); k++)
+                    {
+						if (j == k || i == k) continue;
+						if (dp[i, k] != 0 && dp[k, i] != 0) continue;
+						if (dp[i, k] == 0 && dp[j, k] != 0 && dp[i, j] != 0)
+						{
+							dp[i, k] = dp[j, k] == dp[i, j] ? dp[j, k] : 0;
+							dp[k, i] = dp[i, k] * (-1);
+						}
+					}
+                }
+			}
+			for (int i = 1; i < dp.GetLength(0); i++)
+			{
+				int cnt = 0;
+				for (int j = 1; j < dp.GetLength(0); j++)
+				{ 
+					if (dp[i, j] != 0) cnt++;
+				}
+				if (cnt == n - 1) answer++;
+			}
+			return answer;
+		}
+
+		private static string BigNumber(int[] numbers)
+		{
+            //{ 6,2,10}
+            //[3, 30, 34, 5, 9]
+            //{ 0, 0, 0, 0, 0 } // 0
+            //{ 0, 5, 10, 15, 20 } // 52015100
+            //{ 1000, 0, 5, 99, 100 } // 99510010000
+            string answer = string.Empty;
+            /*
+            List<string> list = new List<string>();
+
+			list.Add(numbers[0].ToString());
+			if (String.Compare(numbers[0].ToString() + numbers[1].ToString(),numbers[1].ToString() + numbers[0].ToString()) == 1)
+				list.Add(numbers[1].ToString());
+			else
+				list.Insert(0,numbers[1].ToString());
+				
+			
+
+            for (int i = 2; i < numbers.Length; i++)
+            {
+                int left = 0;
+                int right = i - 1;
+                int mid = ((right + left) / 2);
+                string cur = numbers[i].ToString();
+                int idx = 0;
+                while (left <= right)
+                {
+                    mid = ((right + left) / 2);
+
+                    if (String.Compare(cur + list[left].ToString(), list[left].ToString() + cur) == 1)
+                    {
+                        right = mid - 1;
+                        idx = mid;
+                    }
+                    else
+                    {
+                        left = mid + 1;
+                        idx = mid;
+                    }
+                }
+				list.Insert(idx, numbers[i].ToString());
+            }
+
+            foreach (string num in list) answer += num;
+            if (answer[0] == '0') answer = "0";
+			*/
+            Array.Sort(numbers, (a, b) =>
+            {
+                return String.Compare(a.ToString() + b.ToString(), b.ToString() + a.ToString()) * -1;
+            });
+			//foreach (int num in numbers) answer += num.ToString();
+			answer = string.Join("", numbers);
+            if (answer[0] == '0') answer = "0";
+            return answer;
+		}
+
+		private static int[] BinaryConvert(string s)
+		{
+			int changeCnt = 0;
+			int removeCnt = 0;
+            while (s.Length > 0)
+            {
+                if (s == "1") break;
+                removeCnt += s.Length - s.Replace("0", "").Length;
+				// 10진수를 2진수 문자열로
+				s = Convert.ToString(s.Replace("0", "").Length, 2);
+				changeCnt++;
+            }
+            return new int[] { changeCnt, removeCnt };
+		}
 	}
 	public class Print
 	{
