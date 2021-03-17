@@ -11,6 +11,8 @@ namespace ConsoleApp1
 	{
 		static void Main(string[] args)
 		{
+			string ss = Microsoft.VisualBasic.Strings.Right("12345", 2);
+			
 			Program p = new Program();
 
 			#region TestEnd
@@ -107,7 +109,7 @@ namespace ConsoleApp1
 			//BigNumber(new int[] { 1000, 0, 5, 99, 100 });
 			#endregion
 
-			BinaryConvert("110010101001");
+			//BinaryConvert("110010101001");
 		}
 
 		/// <summary>
