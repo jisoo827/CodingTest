@@ -110,6 +110,7 @@ namespace ConsoleApp1
 			#endregion
 
 			//BinaryConvert("110010101001");
+			UndoRedo();
 		}
 
 		/// <summary>
@@ -2085,6 +2086,30 @@ namespace ConsoleApp1
             }
             return new int[] { changeCnt, removeCnt };
 		}
+
+		private static void UndoRedo()
+        {
+			Stack<List<int>> undoStack = new Stack<List<int>>();
+			Stack<List<int>> redoStack = new Stack<List<int>>();
+			List<int> list = new List<int>();
+			list.Add(123);
+			undoStack.Push(new List<int>(list));
+			list.Add(234);
+			undoStack.Push(new List<int>(list));
+			list.Add(345);
+			undoStack.Push(new List<int>(list));
+			list.Add(456);
+			undoStack.Push(new List<int>(list));
+			#region undo
+			redoStack.Push(undoStack.Pop());
+			list = undoStack.Peek();
+            #endregion
+            #region redo
+            undoStack.Push(redoStack.Pop());
+            list = undoStack.Peek(); 
+            #endregion
+
+        }
 	}
 	public class Print
 	{
