@@ -110,7 +110,12 @@ namespace ConsoleApp1
 			#endregion
 
 			//BinaryConvert("110010101001");
-			UndoRedo();
+			//UndoRedo();
+			//Ternary(45);
+			RightBracket("[](){}");
+			RightBracket("}]()[{");
+			RightBracket("[)(]");
+			RightBracket("}}}");
 		}
 
 		/// <summary>
@@ -2072,6 +2077,11 @@ namespace ConsoleApp1
             return answer;
 		}
 
+		/// <summary>
+		/// 프로그래머스 월간 코드 챌린지 시즌1 2단계 이진 변환 반복하기
+		/// </summary>
+		/// <param name="s"></param>
+		/// <returns></returns>
 		private static int[] BinaryConvert(string s)
 		{
 			int changeCnt = 0;
@@ -2109,6 +2119,62 @@ namespace ConsoleApp1
             list = undoStack.Peek(); 
             #endregion
 
+        }
+
+		/// <summary>
+		/// 프로그래머스 월간 코드 챌린지 시즌1 1단계 3진법 뒤집기
+		/// </summary>
+		/// <param name="n"></param>
+		/// <returns></returns>
+		private static int Ternary(int n)
+        { //45 1200 0021 7
+			int rtnVal = 0;
+			int deep = 0;
+
+			while(Math.Pow(3, deep) <= n) deep++;
+
+			int[] rtn = new int[deep--];
+			for (int i = 0; i < rtn.Length; i++)
+			{ 
+				if (n >= Math.Pow(3, deep) && n < 2 * Math.Pow(3, deep)) rtn[i] = 1;
+				else if (n >= 2 * Math.Pow(3, deep)) rtn[i] = 2;
+				else rtn[i] = 0;
+				n -= (int)Math.Pow(3, deep) * rtn[i];
+				deep--;
+				rtnVal += (int)Math.Pow(3, i) * rtn[i];
+			}				
+			
+			return rtnVal;
+        }
+
+		private static int RightBracket(string s)
+        {
+			int rtnVal = 0;
+			Stack<char> stack = new Stack<char>();
+			for(int i = 0; i < s.Length; i++)
+            {
+				string temp = s.Substring(0, 1);
+				bool chk = true;
+				foreach(char c in s)
+                {
+					if("|{|[|(".Contains(c))
+                    {
+						stack.Push(c);
+                    }
+					else if (stack.Count > 0 && (( c == '}' && stack.Peek() == '{' ) || (c == ')' && stack.Peek() == '(') || (c == ']' && stack.Peek() == '[')))
+                    {
+						stack.Pop();
+                    }
+					else
+                    {
+						chk = false;
+						break;
+                    }
+                }
+				if (chk) rtnVal++;
+				s = s.Substring(1, s.Length - 1) + temp;
+            }
+			return rtnVal;
         }
 	}
 	public class Print
