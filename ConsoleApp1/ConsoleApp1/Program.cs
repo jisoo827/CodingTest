@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ConsoleApp1
 {
-	class Program
+	public class Program
 	{
 		static void Main(string[] args)
 		{
@@ -112,10 +112,14 @@ namespace ConsoleApp1
 			//BinaryConvert("110010101001");
 			//UndoRedo();
 			//Ternary(45);
-			RightBracket("[](){}");
-			RightBracket("}]()[{");
-			RightBracket("[)(]");
-			RightBracket("}}}");
+			//RightBracket("[](){}");
+			//RightBracket("}]()[{");
+			//RightBracket("[)(]");
+			//RightBracket("}}}");
+			//HIndex(new int[] { 3, 0, 6, 1, 5 });
+			//DecompositionSum();
+			//BlackJack();
+			PartialSum();
 		}
 
 		/// <summary>
@@ -2147,6 +2151,11 @@ namespace ConsoleApp1
 			return rtnVal;
         }
 
+		/// <summary>
+		/// 프로그래머스 월간 코드 챌린지 시즌2 2단계 괄호 회전하기
+		/// </summary>
+		/// <param name="s"></param>
+		/// <returns></returns>
 		private static int RightBracket(string s)
         {
 			int rtnVal = 0;
@@ -2176,6 +2185,114 @@ namespace ConsoleApp1
             }
 			return rtnVal;
         }
+
+		/// <summary>
+		/// 프로그래머스 정렬 2단계 H-Index
+		/// </summary>
+		/// <param name="citations"></param>
+		/// <returns></returns>
+		private static int HIndex (int[] citations)
+        {
+			int answer = 0;
+			for (int i = citations.Length; i >= 0; i--)
+            {
+				if (i == citations.Where(x => x >= i).Count())
+                {
+					answer = i;
+					break;
+                }
+            }
+
+			return answer;
+        }
+
+		/// <summary>
+		/// 백준 브루트포스 2231 분해합 
+		/// </summary>
+		private static void DecompositionSum()
+        {
+			int n = int.Parse(Console.ReadLine());
+			for(int i = n - (9*(n.ToString().Length)); i < n; i++)
+            {
+				int digitSum = 0;
+				for (int j = 0; j < i.ToString().Length; j++)
+				{
+					digitSum += (i / (int)Math.Pow(10,j)) % 10;
+				}
+				if (n == i + digitSum)
+				{
+					Console.WriteLine(i);
+					return;
+				}
+			}
+			Console.WriteLine("0");
+			return ;
+        }
+		
+		/// <summary>
+		/// 백준 브루트포스 2798 블랙잭
+		/// </summary>
+		private static void BlackJack()
+        {
+			//10 500 => 497 
+			//93 181 245 214 315 36 185 138 216 295
+			int[] arr = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
+			int[] number = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
+			int answer = 0;
+			for(int i = 0; i < arr[0]; i++)
+            {
+				for(int j = i+1; j < arr[0]; j++)
+                {
+					for(int k = j + 1; k < arr[0]; k++)
+                    {
+						int sum = number[i] + number[j] + number[k] > arr[1] ? 0 : number[i] + number[j] + number[k];
+						if (sum == arr[1])
+                        {
+							Console.WriteLine(arr[1]);
+							return;
+                        }
+						answer = Math.Max(answer, sum);
+                    }
+                }
+            }
+			Console.WriteLine(answer);
+			return;
+		}
+
+		[Fact]
+		/// <summary>
+		/// 백준 투 포인트 1806 부분합
+		/// </summary>
+		private static void PartialSum()
+        {
+			//10 15
+			//5 1 3 5 10 7 4 9 2 8
+			int[] arr = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
+			int[] number = Array.ConvertAll(Console.ReadLine().Split(), int.Parse);
+			int sum = 0, answer = arr[1] + 1;
+			for (int i = 0; i < arr[0]; i++)
+            {
+				if (answer != arr[1] + 1 && i - 1 + answer < arr[0])
+				{
+					sum = sum - number[i-1] + number[i - 1 + answer];
+					if (sum < arr[1]) continue;
+				}
+				sum = 0;
+				for (int j = i; j < arr[0]; j++)
+				{
+					if (j - i + 1 >= answer) break;
+					sum += number[j];
+					if (sum >= arr[1])
+					{
+						answer = j - i + 1;
+						break;
+					}
+				}
+				
+            }
+			Console.WriteLine(answer);
+		}
+
 	}
 	public class Print
 	{
