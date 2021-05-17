@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
+
 
 namespace ConsoleApp1
 {
@@ -119,7 +122,8 @@ namespace ConsoleApp1
 			//HIndex(new int[] { 3, 0, 6, 1, 5 });
 			//DecompositionSum();
 			//BlackJack();
-			PartialSum();
+			//PartialSum();
+			ParallelTest();
 		}
 
 		/// <summary>
@@ -2259,7 +2263,6 @@ namespace ConsoleApp1
 			return;
 		}
 
-		[Fact]
 		/// <summary>
 		/// 백준 투 포인트 1806 부분합
 		/// </summary>
@@ -2292,6 +2295,49 @@ namespace ConsoleApp1
             }
 			Console.WriteLine(answer);
 		}
+
+		private static void ParallelTest()
+        {
+			var limit = 5000000;
+			var numbers = Enumerable.Range(0, limit).ToList();
+
+			var watch = Stopwatch.StartNew();
+			var primeNumbersFromForeach = GetPrimeList(numbers);
+			watch.Stop();
+
+			var watchForParallel = Stopwatch.StartNew();
+			var primeNumbersFromParallelForeach = GetPrimeListWithPararrel(numbers);
+			watchForParallel.Stop();
+			Console.WriteLine($"Classical foreach loop | Total prime numbers : {primeNumbersFromForeach.Count} | Time Taken : {watch.ElapsedMilliseconds} ms.");
+			Console.WriteLine($"Parallel.ForEach loop  | Total prime numbers : {primeNumbersFromParallelForeach.Count} | Time Taken : {watchForParallel.ElapsedMilliseconds} ms.");
+			Console.WriteLine("Press any key to exit.");
+			Console.ReadLine();
+		}
+
+		private static IList<int> GetPrimeList(IList<int> numbers) => numbers.Where(IsPrime).ToList();
+
+		private static IList<int> GetPrimeListWithPararrel(IList<int> numbers)
+        {
+			var primeNum = new ConcurrentBag<int>();
+			Parallel.ForEach(numbers, number =>
+			{
+				if (IsPrime(number))
+				{
+					primeNum.Add(number);
+				}
+			});
+			return primeNum.ToList();
+        }
+
+		private static bool IsPrime(int number)
+        {
+			if (number < 2) return false;
+			for (var divisor = 2; divisor <= Math.Sqrt(number); divisor++)
+            {
+				if (number % divisor == 0) return false;
+            }
+			return true;
+        }
 
 	}
 	public class Print
