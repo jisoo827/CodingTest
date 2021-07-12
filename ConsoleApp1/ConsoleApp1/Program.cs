@@ -123,7 +123,13 @@ namespace ConsoleApp1
 			//DecompositionSum();
 			//BlackJack();
 			//PartialSum();
-			ParallelTest();
+			//ParallelTest();
+			string s = "hello";
+			string d = s;
+			d = "world";
+			Console.Write(s);
+			s = s + " " + d;
+
 		}
 
 		/// <summary>
